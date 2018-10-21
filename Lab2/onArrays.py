@@ -99,16 +99,33 @@ def make_histogram(dict):
         x.append(i)
         y.append(hist[i])
 
+    x.sort
+    y.sort
     return x, y
 
 
-def merge_dict(dict1, dict2):
-    for i in dict2:
-        if i in dict1:
-            dict1[i] += dict2[i]
-        else:
-            dict1[i] = dict2[i]
-    return dict1
+def merge_dict(x_tmp, y_tmp, x, y):
+    #align list length
+    target_len = max(len(x_tmp), len(x))
+
+    if target_len > len(x):
+        missing = target_len - len(x)
+        for i in range(missing):
+            x.append(0)
+            y.append(0)
+
+    if target_len > len(x_tmp):
+        missing = target_len - len(x_tmp)
+        for j in range(missing):
+            x_tmp.append(0)
+            y_tmp.append(0)
+
+    #adding to array
+    for i in range(target_len):
+        x[i] = x[i] + x_tmp[i]
+        y[i] = y[i] + y_tmp[i]
+
+    return x, y
 
 
 def calculate(n, p, nd, nh):
@@ -124,23 +141,25 @@ def make_statistics(n, p, nd, nh, amount_of_simulation):
     amount_of_sus_pairs = 0
     amount_of_suspected_people_and_days = 0
     amount_of_sus_people = 0
-    dict = {}
+    x=[]
+    y=[]
     for i in range(amount_of_simulation):
         amount_of_sus_pairs_tmp, amount_of_suspected_people_and_days_tmp, amount_of_sus_people_tmp, pair_meets_dict = calculate(n, p, nd, nh)
         amount_of_sus_pairs += amount_of_sus_pairs_tmp
         amount_of_suspected_people_and_days += amount_of_suspected_people_and_days_tmp
         amount_of_sus_people += amount_of_sus_people_tmp
-        dict = merge_dict(dict, pair_meets_dict)
+        x_tmp, y_tmp = make_histogram(pair_meets_dict)
+        x, y = merge_dict(x_tmp, y_tmp, x, y)
 
 
     amount_of_sus_pairs = amount_of_sus_pairs / amount_of_simulation
     amount_of_suspected_people_and_days = amount_of_suspected_people_and_days / amount_of_simulation
     amount_of_sus_people = amount_of_sus_people / amount_of_simulation
 
-    x, y = make_histogram(dict)
-    print(x, y)
-    for i in range(len(y)):
-         y[i] = int(y[i] / amount_of_simulation)
+    for i in range(len(x)):
+        x[i] = int(x[i] / amount_of_simulation)
+        y[i] = int(y[i] / amount_of_simulation)
+
 
     return amount_of_sus_pairs, amount_of_suspected_people_and_days, amount_of_sus_people, x, y
 
@@ -149,7 +168,7 @@ def main():
     p = 0.1
     nd = 100
     nh = 100
-    amount_of_simulation = 2
+    amount_of_simulation = 10
 
     amount_of_sus_pairs, amount_of_suspected_people_and_days, amount_of_sus_people, x, y= make_statistics(n, p, nd, nh, amount_of_simulation)
     print("Liczba podejrzanych par osób: ", int(round(amount_of_sus_pairs,0)))
