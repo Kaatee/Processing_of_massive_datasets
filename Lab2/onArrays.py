@@ -163,6 +163,13 @@ def make_statistics(n, p, nd, nh, amount_of_simulation):
 
     return amount_of_sus_pairs, amount_of_suspected_people_and_days, amount_of_sus_people, x, y
 
+def calculate_max(amount_of_pairs):
+    return int(2*amount_of_pairs)
+
+def calculate_min(amount_of_pairs):
+    return math.ceil((1+math.sqrt(8*amount_of_pairs+1))/2)
+
+
 def main():
     n = 10000
     p = 0.1
@@ -177,6 +184,9 @@ def main():
     print("Histogram: ")
     for i in range(len(x)):
         print(x[i]," = ", y[i])
+
+    print("Maksymalna liczba podejrzanych osób: ", calculate_max(amount_of_sus_pairs))
+    print("Minimalna liczba podejrzanych osób: ", calculate_min(amount_of_sus_pairs))
 
 if __name__ == "__main__":
     main()
